@@ -1,3 +1,4 @@
+import re
 from flask import Flask, request, jsonify, Response
 import xml.etree.ElementTree as ET
 
@@ -25,9 +26,42 @@ class Banco:
         ET.SubElement(banco_xml, "nombre").text = self.nombre
         return banco_xml
 
+class Pago:
+    def __init__(self, codigo_banco, fecha, nit_cliente, valor):
+        self.codigo_banco = codigo_banco
+        self.fecha = fecha
+        self.nit_cliente = nit_cliente
+        self.valor = valor
+
+    def to_xml(self):
+        pago_xml = ET.Element("pago")
+        ET.SubElement(pago_xml, "codigo_banco").text = self.codigo_banco
+        ET.SubElement(pago_xml, "fecha").text = self.fecha
+        ET.SubElement(pago_xml, "nit_cliente").text = self.nit_cliente
+        ET.SubElement(pago_xml, "valor").text = str(self.valor)
+        return pago_xml
+
+class Factura:
+    def __init__(self, numero_factura, nit_cliente, fecha, valor):
+        self.numero_factura = numero_factura
+        self.nit_cliente = nit_cliente
+        self.fecha = fecha
+        self.valor = valor
+
+    def to_xml(self):
+        factura_xml = ET.Element("factura")
+        ET.SubElement(factura_xml, "numero_factura").text = self.numero_factura
+        ET.SubElement(factura_xml, "nit_cliente").text = self.nit_cliente
+        ET.SubElement(factura_xml, "fecha").text = self.fecha
+        ET.SubElement(factura_xml, "valor").text = str(self.valor)
+        return factura_xml
+
+
 # Mantenemos los datos en memoria en lugar de escribir en disco
 clientes_acumulativos = []
 bancos_acumulativos = []
+pagos_acumulativos = []
+facturas_acumulativas = []
 
 @app.route('/cargar_xml', methods=['POST'])
 def subir_xml():
@@ -99,8 +133,6 @@ def obtener_estadisticas():
 
     return Response(resultado_xml, mimetype='text/xml')
 
-
-
 def construir_xml(clientes, bancos):
     resultado_xml = '<?xml version="1.0" encoding="UTF-8"?>\n'
     resultado_xml += '<datos>\n'
@@ -140,7 +172,132 @@ def construir_estadisticas(clientes, bancos, nuevos_clientes, nuevos_bancos):
 
     return resultado_xml
 
+def parsear_pagos_y_facturas(archivo):
+    nuevos_pagos = []
+    nuevas_facturas = []
 
+    tree = ET.parse(archivo)
+    root = tree.getroot()
+
+    for pago_xml in root.findall('./pagos/pago'):
+        codigo_banco = pago_xml.find('codigoBanco').text
+        fecha_texto = pago_xml.find('fecha').text
+        fecha_numero = extraer_numeros_fecha(fecha_texto)
+        nit_cliente = pago_xml.find('NITcliente').text
+        valor = float(pago_xml.find('valor').text)
+        pago = Pago(codigo_banco, fecha_numero, nit_cliente, valor)
+        nuevos_pagos.append(pago)
+
+    for factura_xml in root.findall('./facturas/factura'):
+        numero_factura = factura_xml.find('numeroFactura').text  # Cambiar 'numero_factura' a 'numeroFactura'
+        nit_cliente = factura_xml.find('NITcliente').text
+        fecha_texto = factura_xml.find('fecha').text
+        fecha_numero = extraer_numeros_fecha(fecha_texto)
+        valor = float(factura_xml.find('valor').text)
+        factura = Factura(numero_factura, nit_cliente, fecha_numero, valor)
+        nuevas_facturas.append(factura)
+
+
+    # Extender las listas acumulativas con los nuevos pagos y facturas
+    pagos_acumulativos.extend(nuevos_pagos)
+    facturas_acumulativas.extend(nuevas_facturas)
+
+    return nuevos_pagos, nuevas_facturas
+
+# Ruta para cargar XML de pagos y facturas
+@app.route('/cargar_pagos_y_facturas', methods=['POST'])
+def subir_pagos_y_facturas():
+    if 'archivo' not in request.files:
+        return jsonify({'error': 'No se ha enviado ningún archivo'})
+
+    archivo = request.files['archivo']
+    if archivo.filename == '':
+        return jsonify({'error': 'No se ha seleccionado ningún archivo'})
+
+    if archivo and archivo.filename.endswith('.xml'):
+        nuevos_pagos, nuevas_facturas = parsear_pagos_y_facturas(archivo)
+        # Aquí podrías realizar acciones adicionales, como almacenar los nuevos pagos y facturas en una base de datos
+        return jsonify({'mensaje': 'Archivo de pagos y facturas XML subido exitosamente'})
+    else:
+        return jsonify({'error': 'El archivo subido no es un archivo XML válido'})
+
+@app.route('/obtener_datos_facturas_pagos', methods=['GET'])
+def obtener_datos_facturas_pagos():
+    # Construir el XML con los datos acumulados de facturas y pagos
+    xml_data = construir_xml_facturas_pagos()
+
+    # Devolver el XML como una respuesta
+    return Response(xml_data, mimetype='text/xml')
+
+def extraer_numeros_fecha(texto_fecha):
+    # Expresión regular para extraer solo los números de la fecha
+    patron_fecha = r'\b(\d{2}/\d{2}/\d{4})\b'
+    # Buscar coincidencias en el texto de la fecha
+    match = re.search(patron_fecha, texto_fecha)
+    if match:
+        return match.group(1)
+    else:
+        return None
+
+def construir_xml_facturas_pagos():
+    resultado_xml = '<?xml version="1.0" encoding="UTF-8"?>\n'
+    resultado_xml += '<datos>\n'
+    
+    resultado_xml += '  <pagos>\n'
+    for pago in pagos_acumulativos:
+        resultado_xml += '    <pago>\n'
+        resultado_xml += f'      <codigoBanco>{pago.codigo_banco}</codigoBanco>\n'
+        resultado_xml += f'      <fecha>{pago.fecha}</fecha>\n'
+        resultado_xml += f'      <NITcliente>{pago.nit_cliente}</NITcliente>\n'
+        resultado_xml += f'      <valor>{pago.valor}</valor>\n'
+        resultado_xml += '    </pago>\n'
+    resultado_xml += '  </pagos>\n'
+    
+    resultado_xml += '  <facturas>\n'
+    for factura in facturas_acumulativas:
+        resultado_xml += '    <factura>\n'
+        resultado_xml += f'      <numeroFactura>{factura.numero_factura}</numeroFactura>\n'
+        resultado_xml += f'      <NITcliente>{factura.nit_cliente}</NITcliente>\n'
+        resultado_xml += f'      <fecha>{factura.fecha}</fecha>\n'
+        resultado_xml += f'      <valor>{factura.valor}</valor>\n'
+        resultado_xml += '    </factura>\n'
+    resultado_xml += '  </facturas>\n'
+
+    resultado_xml += '</datos>'
+    return resultado_xml
+
+
+# Función para analizar facturas y pagos
+def analizar_facturas_pagos(facturas, pagos):
+    # Contadores
+    total_facturas = len(facturas)
+    total_pagos = len(pagos)
+    facturas_duplicadas = len(facturas) - len(set(factura.numero_factura for factura in facturas))
+    pagos_duplicados = len(pagos) - len(set(pago.codigo_banco for pago in pagos))
+    facturas_con_error = sum(1 for factura in facturas if factura.valor <= 0)
+    pagos_con_error = sum(1 for pago in pagos if pago.valor <= 0)
+
+    # Crear XML con resultados
+    xml_data = f'<?xml version="1.0" encoding="UTF-8"?>\n'
+    xml_data += '<analisis>\n'
+    xml_data += f'  <total_facturas>{total_facturas}</total_facturas>\n'
+    xml_data += f'  <facturas_duplicadas>{facturas_duplicadas}</facturas_duplicadas>\n'
+    xml_data += f'  <facturas_con_error>{facturas_con_error}</facturas_con_error>\n'
+    xml_data += f'  <total_pagos>{total_pagos}</total_pagos>\n'
+    xml_data += f'  <pagos_duplicados>{pagos_duplicados}</pagos_duplicados>\n'
+    xml_data += f'  <pagos_con_error>{pagos_con_error}</pagos_con_error>\n'
+    xml_data += '</analisis>'
+
+    return xml_data
+
+# Ruta para analizar facturas y pagos en formato XML
+@app.route('/analizar_facturas_pagos_xml', methods=['GET'])
+def mostrar_analisis_facturas_pagos_xml():
+    # Obtener resultados del análisis
+    xml_data = analizar_facturas_pagos(facturas_acumulativas, pagos_acumulativos)
+
+    # Devolver los resultados como XML
+    return Response(xml_data, mimetype='text/xml')
 
 if __name__ == '__main__':
     app.run(debug=True, port=4000)
