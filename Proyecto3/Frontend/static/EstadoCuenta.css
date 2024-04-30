@@ -1,0 +1,308 @@
+/* resets */
+*,
+*::before,
+*::after {
+box-sizing: border-box;
+}
+:root {
+--background: rgba(0, 214, 170, 0.85);
+}
+body {
+margin: 0;
+background: #222;
+font-family: sans-serif;
+font-weight: 400;
+}
+.content {
+height: 130vh;
+background-image: url(//unsplash.it/1000/1000);
+background-color: #333;
+background-blend-mode: multiply;
+background-size: cover;
+display: grid;
+place-items: center;
+}
+.content h1 {
+color: white;
+margin: 0; /* Elimina el margen */
+padding: 100px 0; /* Ajusta el espaciado interno superior e inferior */
+height: 550px;
+}
+
+/* nav styles */
+header {
+background: var(--background);
+text-align: center;
+position: fixed;
+z-index: 900;
+width: 100%;
+}
+.nav-toggle {
+display: none;
+}
+.nav-toggle-label {
+position: absolute;
+top: 0;
+left: 0;
+margin-left: 1em;
+height: 100%;
+display: flex;
+align-items: center;
+}
+.nav-toggle-label span,
+.nav-toggle-label span::before,
+.nav-toggle-label span::after {
+display: block;
+background: white;
+height: 2px;
+width: 2em;
+border-radius: 2px;
+position: relative;
+}
+.nav-toggle-label span::before,
+.nav-toggle-label span::after {
+content: "";
+position: absolute;
+}
+.nav-toggle-label span::before {
+bottom: 7px;
+}
+.nav-toggle-label span::after {
+top: 7px;
+}
+
+nav {
+position: absolute;
+text-align: left;
+top: 100%;
+left: 0;
+background: var(--background);
+width: 100%;
+transform: scale(1, 0);
+transform-origin: top;
+transition: transform 400ms ease-in-out;
+}
+
+nav ul {
+margin: 0;
+padding: 0;
+list-style: none;
+}
+nav li {
+margin-bottom: 1em;
+margin-left: 1em;
+}
+nav a {
+color: white;
+text-decoration: none;
+font-size: 1.2rem;
+text-transform: uppercase;
+opacity: 0;
+transition: opacity 150ms ease-in-out;
+}
+
+nav a:hover {
+color: #b2ff00;
+}
+
+nav a:hover {
+    background-image: linear-gradient(90deg, green, yellow);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.nav-toggle:checked ~ nav {
+transform: scale(1, 1);
+}
+.nav-toggle:checked ~ nav a {
+opacity: 1;
+transition: opacity 250ms ease-in-out 250ms;
+}
+
+@media screen and (min-width: 768px) {
+.nav-toggle-label {
+    display: none;
+}
+header {
+    display: grid;
+    grid-template-columns: 1fr auto minmax(600px, 3fr) 1fr;
+}
+.logo {
+    grid-column: 1 / 2;
+}
+nav {
+    all: unset;
+    grid-column: 3 / 4;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+nav ul {
+    display: flex;
+}
+nav li {
+    margin-left: 2em;
+    margin-bottom: 0;
+}
+nav a {
+    opacity: 1;
+    position: relative;
+}
+nav a::before {
+    content: '';
+    display: block;
+    height: 5px;
+    background: black;
+    position: absolute;
+    bottom: -.75em;
+    left: 0; right: 0;
+    transform: scale(0, 1);
+    transition: transform ease-in-out 250ms;
+}
+nav a:hover::before {
+    transform: scale(1, 1);
+}
+}
+
+.sub-menu{
+    display: none;
+}
+
+ul li:hover .sub-menu{
+    display: block;
+    position: absolute;
+    background: rgb(0,0,0,0.5);
+    margin-top: 15px;
+    margin-left: -15px;
+}
+
+ul li:hover .sub-menu ul{
+    display: block;
+    margin: 10px;
+}
+
+ul li:hover .sub-menu ul li{
+    width: 150px;
+    padding: 10px;
+    border-bottom: 1px dotted #fff;
+    background: transparent;
+    border-radius: 0;
+    text-align: left;
+}
+
+ul li:hover .sub-menu ul li:last-child{
+    border-bottom: none;
+}
+
+ul li:hover .sub-menu ul li a:hover{
+    color: #b2ff00;
+}
+
+ul li:hover .sub-menu ul li a:hover{
+    background-image: linear-gradient(90deg, green, yellow);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.sub-menu-1{
+    display: none;
+}
+
+ul li .sub-menu ul li:hover .sub-menu-1{
+    display: block;
+    position: absolute;
+    width: 300px;
+    background: rgb(0,0,0,0.5);
+    margin-top: 90px;
+    left: 100%;
+    top: 0;
+}
+
+ul li .sub-menu ul li:hover .sub-menu-1 ul{
+    display: block;
+    margin: 10px;
+}
+
+ul li .sub-menu ul li:hover .sub-menu-1 ul li{
+    width: 150px;
+    padding: 10px;
+    border-bottom: 1px dotted #fff;
+    background: transparent;
+    border-radius: 0;
+    text-align: left;
+}
+
+ul li .sub-menu ul li:hover .sub-menu-1 ul li:last-child{
+    border-bottom: none;
+}
+
+.container {
+    width: 400px; /* Ancho del contenedor */
+    height: 250px; /* Altura del contenedor */
+    background-color: rgba(255, 255, 255, 0.5); /* Color de fondo blanco-transparente */
+    overflow-y: auto; /* Agrega una barra de desplazamiento vertical cuando el contenido excede la altura del contenedor */
+    padding: 10px; /* Espaciado interno */
+    margin-top: -600px;
+}
+
+.input-container {
+    margin-top: -420px;
+    display: flex;
+    align-items: center;
+}
+
+.input-container input[type="text"] {
+    width: 200px;
+    height: 30px;
+    margin-right: 10px;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.input-container button {
+    height: 34px;
+    padding: 5px 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    margin-right: 10px;
+    cursor: pointer;
+}
+
+.input-container button:hover {
+    background-color: #45a049;
+}
+
+.show-nits {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: #fff;
+    text-decoration: none;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.show-nits:hover {
+    background-color: #0056b3;
+}
+
+#container ul{
+    list-style-type: none;
+}
+#consultaContainer ul {
+    list-style-type: none; /* Quita los puntos solo de la lista dentro de #consultaContainer */
+}
+
+.container hidden {
+    width: 400px; /* Ancho del contenedor */
+    height: 250px; /* Altura del contenedor */
+    background-color: rgba(255, 255, 255, 0.5); /* Color de fondo blanco-transparente */
+    overflow-y: auto; /* Agrega una barra de desplazamiento vertical cuando el contenido excede la altura del contenedor */
+    padding: 10px; /* Espaciado interno */
+    margin-top: -600px;
+}

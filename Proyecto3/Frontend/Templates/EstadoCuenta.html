@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="https://i.pinimg.com/736x/e1/55/4f/e1554f81fbe26fa5b90a30401c3ae363.jpg">
+    <link rel="stylesheet" href="static/EstadoCuenta.css">
+    <title>Document</title>
+
+</head>
+<body>
+    <header>
+        <h1 class="logo">ITGSA</h1>
+        <input type="checkbox" id="nav-toggle" class="nav-toggle">
+        <label for='nav-toggle' class="nav-toggle-label"><span></span></label>
+        <nav id="main-navigation" class="navigation">
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/borrar_datos_backend">Resetear Datos</a></li>
+            <li><a href="/Carga_C">Configuración</a></li>
+            <li><a href="/Cargar_F">Transacciones</a></li>
+            <li><a href="#">Peticiones</a>
+            <div class="sub-menu">
+                <ul>
+                <li><a href="#">Estado de cuenta</a></li>
+                <li><a href="#">Ingresos</a></li>
+                <li><a href="#">Ayuda</a><div class="sub-menu-1">
+                    <ul>
+                    <li><a href="#">Estudiante</a></li>
+                    <li><a href="#">Documentación</a></li>
+                    </ul>
+                </div>
+                </li>
+                </ul>
+            </div>
+            </li>
+        </ul>
+        </nav>
+    </header>
+    
+    <div class="content">
+        <h1>Industria Típica Guatemalteca, S.A.</h1>
+    
+            <div class="container" id="container">
+                {% if error %}
+                    <p>{{ error }}</p>
+                {% else %}
+                    <ul>
+                        {% for cliente in clientes %}
+                            <li>{{ cliente.nit }} - {{ cliente.nombre }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+    
+            <div class="container hidden" id="consultaContainer">
+                {% if datos_cuenta %}
+                    <ul>
+                        {% for cuenta in datos_cuenta %}
+                            <li>Cliente: {{ cuenta.nit_cliente }} - {{ cuenta.nombre_cliente }}</li>
+                            <li>Nombre del banco: {{ cuenta.nombre_banco }}</li>
+                            <li>Saldo: {{ cuenta.saldo }}</li>
+                            <li>Fecha de Factura: {{ cuenta.fecha_factura }}</li>
+                            <li>Cargo: {{ cuenta.cantidad_factura }}</li>
+                            <li>Fecha de Pago: {{ cuenta.fecha_pago }}</li>
+                            <li>Pago: {{ cuenta.cantidad_pago }}</li>
+                            <li>--------------------------------------------------</li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>No se encontraron datos para el NIT ingresado.</p>
+                {% endif %}
+            </div>
+
+        <div class="input-container">
+            <form action="{% url 'mostrar_cuenta' %}" method="post">
+                {% csrf_token %}
+                <label for="nit">Ingrese el NIT:</label>
+                <input type="text" id="nit" name="nit" placeholder="Escribe el NIT aquí...">
+                <button type="submit">Consultar</button>
+            </form>
+            <a href="{% url 'mostrar_clientes' %}" class="show-nits">Mostrar nits</a>
+        </div>
+    </div>
+
+    <script>
+        function showConsulta() {
+            document.getElementById("consultaContainer").classList.remove("hidden");
+            document.getElementById("consultaContainer").classList.add("visible");
+            document.getElementById("container").classList.remove("visible");
+            document.getElementById("container").classList.add("hidden");
+        }
+    </script>
+
+</body>
+</html>

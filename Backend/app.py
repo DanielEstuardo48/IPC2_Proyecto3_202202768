@@ -266,7 +266,6 @@ def construir_xml_facturas_pagos():
     resultado_xml += '</datos>'
     return resultado_xml
 
-
 # Función para analizar facturas y pagos
 def analizar_facturas_pagos(facturas, pagos):
     # Contadores
@@ -298,6 +297,77 @@ def mostrar_analisis_facturas_pagos_xml():
 
     # Devolver los resultados como XML
     return Response(xml_data, mimetype='text/xml')
+
+@app.route('/borrardatos', methods=['DELETE'])
+def borrar_datos():
+    global clientes_acumulativos, bancos_acumulativos, pagos_acumulativos, facturas_acumulativas
+    clientes_acumulativos = []
+    bancos_acumulativos = []
+    pagos_acumulativos = []
+    facturas_acumulativas = []
+    return 'Datos borrados correctamente', 200
+
+@app.route('/mostrarclientes', methods=['GET'])
+def mostrar_clientes():
+    # Función para extraer solo los dígitos de un NIT
+    def extraer_digitos(nit):
+        numeros = re.findall(r'\d+', nit)
+        if numeros:
+            return int(numeros[0])
+        else:
+            return float('inf')  # Retorna infinito si no se encuentran números en el NIT
+
+    # Ordenar los clientes por los dígitos del NIT de menor a mayor
+    clientes_ordenados = sorted(clientes_acumulativos, key=lambda x: extraer_digitos(x.nit))
+
+    # Crear la lista de resultados
+    resultado = [{"nit": cliente.nit, "nombre": cliente.nombre} for cliente in clientes_ordenados]
+    return jsonify(resultado)
+
+
+def obtener_datos_cuenta(nit):
+    resultados = []
+
+    # Recorrer todas las facturas y pagos
+    for factura in facturas_acumulativas:
+        for pago in pagos_acumulativos:
+            # Si el NIT del cliente en la factura coincide con el NIT del cliente en el pago
+            if factura.nit_cliente == pago.nit_cliente == nit:
+                # Buscar el cliente correspondiente al NIT
+                cliente = next((c for c in clientes_acumulativos if c.nit == factura.nit_cliente), None)
+                if cliente:
+                    # Buscar el nombre del banco correspondiente al código del banco en el pago
+                    nombre_banco = next((b.nombre for b in bancos_acumulativos if b.codigo == pago.codigo_banco), None)
+                    # Calcular el saldo
+                    saldo = pago.valor - factura.valor
+                    # Establecer el saldo como negativo acompañado de "aun debe" si es negativo
+                    saldo_texto = f'{saldo} aún debe' if saldo < 0 else saldo
+                    # Crear un diccionario con los detalles y agregarlo a los resultados
+                    resultado = {
+                        'nit_cliente': factura.nit_cliente,
+                        'nombre_cliente': cliente.nombre,
+                        'fecha_factura': factura.fecha,
+                        'cantidad_factura': factura.valor,
+                        'fecha_pago': pago.fecha,
+                        'cantidad_pago': pago.valor,
+                        'nombre_banco': nombre_banco,
+                        'saldo': saldo_texto
+                    }
+                    resultados.append(resultado)
+
+    # Ordenar los resultados por fecha de pago de forma descendente (de más reciente a más antigua)
+    resultados = sorted(resultados, key=lambda x: x['fecha_pago'], reverse=True)
+
+    return resultados
+
+@app.route('/consulta_cuenta', methods=['GET'])
+def consulta_cuenta():
+    nit = request.args.get('nit', '')
+    # Lógica para obtener los datos de la cuenta usando la función obtener_datos_cuenta(nit)
+    datos_cuenta = obtener_datos_cuenta(nit)
+    return jsonify(datos_cuenta)
+
+
 
 if __name__ == '__main__':
     app.run(debug=True, port=4000)

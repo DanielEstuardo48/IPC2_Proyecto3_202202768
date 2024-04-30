@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="https://i.pinimg.com/736x/e1/55/4f/e1554f81fbe26fa5b90a30401c3ae363.jpg">
+    <link rel="stylesheet" href="static/Carga_C.css">
+    <title>Configuración</title>
+</head>
+<body>
+    <header>
+        <h1 class="logo">ITGSA</h1>
+        <input type="checkbox" id="nav-toggle" class="nav-toggle">
+        <label for='nav-toggle' class="nav-toggle-label"><span></span></label>
+        <nav id="main-navigation" class="navigation">
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/borrar_datos_backend">Resetear Datos</a></li>
+            <li><a href="/Carga_C">Configuración</a></li>
+            <li><a href="/Cargar_F">Transacciones</a></li>
+            <li><a href="#">Peticiones</a>
+            <div class="sub-menu">
+                <ul>
+                <li><a href="#">Estado de cuenta</a></li>
+                <li><a href="#">Ingresos</a></li>
+                <li><a href="#">Ayuda</a><div class="sub-menu-1">
+                    <ul>
+                    <li><a href="#">Estudiante</a></li>
+                    <li><a href="#">Documentación</a></li>
+                    </ul>
+                </div>
+                </li>
+            </div>
+            </li>
+        </ul>
+        </nav>
+    </header>
+    
+    <div class="content">
+        <h1>Industria Típica Guatemalteca, S.A.</h1>
+        <form action="/cargar_xml_cb" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <label class="seleccionar">Selecciona tu archivo (.xml)</label>
+            <input type="file" id="archivo" name="archivo" accept=".xml" multiple class="cargarcb">
+            <button type="submit">Cargar</button>
+        </form>
+    </div>
+</body>
+</html>
