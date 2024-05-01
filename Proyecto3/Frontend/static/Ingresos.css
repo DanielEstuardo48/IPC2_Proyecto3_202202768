@@ -14,8 +14,8 @@ font-family: sans-serif;
 font-weight: 400;
 }
 .content {
-height: 130vh;
-background-image: url(//unsplash.it/1000/1000);
+height: 120vh;
+background-image: url(https://www.cine.com.pa/wp-content/uploads/2019/11/Bob_Esponja_Un_h_roe_al_rescate-925815269-large-768x472.jpg);
 background-color: #333;
 background-blend-mode: multiply;
 background-size: cover;
@@ -24,9 +24,8 @@ place-items: center;
 }
 .content h1 {
 color: white;
-margin: 0; /* Elimina el margen */
-padding: 100px 0; /* Ajusta el espaciado interno superior e inferior */
-height: 550px;
+font-family: "Bebas Neue", Arial, sans-serif;
+font-size: 80px;
 }
 
 /* nav styles */
@@ -234,85 +233,4 @@ ul li .sub-menu ul li:hover .sub-menu-1 ul li{
 
 ul li .sub-menu ul li:hover .sub-menu-1 ul li:last-child{
     border-bottom: none;
-}
-
-.container {
-    width: 800px; /* Ancho del contenedor */
-    height: 250px; /* Altura del contenedor */
-    background-color: rgba(255, 255, 255, 0.5); /* Color de fondo blanco-transparente */
-    overflow-y: auto; /* Agrega una barra de desplazamiento vertical cuando el contenido excede la altura del contenedor */
-    padding: 10px; /* Espaciado interno */
-    margin-top: -600px;
-    display: flex;
-}
-
-.input-container {
-    margin-top: -420px;
-    display: flex;
-    align-items: center;
-}
-
-.input-container input[type="text"] {
-    width: 200px;
-    height: 30px;
-    margin-right: 10px;
-    padding: 5px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-}
-
-.input-container button {
-    height: 34px;
-    padding: 5px 10px;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    margin-right: 10px;
-    cursor: pointer;
-}
-
-.input-container button:hover {
-    background-color: #45a049;
-}
-
-.show-nits {
-    display: inline-block;
-    padding: 10px 20px;
-    background-color: #007bff;
-    color: #fff;
-    text-decoration: none;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-.show-nits:hover {
-    background-color: #0056b3;
-}
-
-#container ul{
-    list-style-type: none;
-}
-#consultaContainer ul {
-    list-style-type: none; /* Quita los puntos solo de la lista dentro de #consultaContainer */
-}
-
-.left-container,
-.right-container {
-  flex: 1; /* Hace que ambos contenedores ocupen el mismo espacio */
-  border: 1px solid black; /* Agrega un borde para mayor claridad */
-  padding: 20px; /* Agrega espacio interno alrededor del contenido */
-    overflow-y: auto;
-}
-
-.left-container {
-  /* Estilos adicionales para el contenedor izquierdo */
-  background-color: lightblue; /* Cambia el color de fondo */
-}
-
-.right-container {
-  /* Estilos adicionales para el contenedor derecho */
-  background-color: lightgreen; /* Cambia el color de fondo */
 }

@@ -11,4 +11,7 @@ urlpatterns = [
     path('EstadoCuenta', views.EstadoCuenta, name='EstadoCuenta'),
     path('mostrar_clientes', views.mostrar_clientes, name='mostrar_clientes'),
     path('mostrar_cuenta',views.mostrar_cuenta, name='mostrar_cuenta'),
+    path('Estudiante', views.Estudiante, name='estudiante'),
+    path('Documentacion', views.Documentacion, name='documentacion'),
+    path('Ingresos', views.Ingresos, name='ingresos'),
 ]

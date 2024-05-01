@@ -328,32 +328,32 @@ def mostrar_clientes():
 def obtener_datos_cuenta(nit):
     resultados = []
 
-    # Recorrer todas las facturas y pagos
-    for factura in facturas_acumulativas:
-        for pago in pagos_acumulativos:
-            # Si el NIT del cliente en la factura coincide con el NIT del cliente en el pago
-            if factura.nit_cliente == pago.nit_cliente == nit:
-                # Buscar el cliente correspondiente al NIT
-                cliente = next((c for c in clientes_acumulativos if c.nit == factura.nit_cliente), None)
-                if cliente:
-                    # Buscar el nombre del banco correspondiente al código del banco en el pago
-                    nombre_banco = next((b.nombre for b in bancos_acumulativos if b.codigo == pago.codigo_banco), None)
-                    # Calcular el saldo
-                    saldo = pago.valor - factura.valor
-                    # Establecer el saldo como negativo acompañado de "aun debe" si es negativo
-                    saldo_texto = f'{saldo} aún debe' if saldo < 0 else saldo
-                    # Crear un diccionario con los detalles y agregarlo a los resultados
-                    resultado = {
-                        'nit_cliente': factura.nit_cliente,
-                        'nombre_cliente': cliente.nombre,
-                        'fecha_factura': factura.fecha,
-                        'cantidad_factura': factura.valor,
-                        'fecha_pago': pago.fecha,
-                        'cantidad_pago': pago.valor,
-                        'nombre_banco': nombre_banco,
-                        'saldo': saldo_texto
-                    }
-                    resultados.append(resultado)
+    # Filtrar las facturas y pagos correspondientes al NIT proporcionado
+    facturas_cliente = [factura for factura in facturas_acumulativas if factura.nit_cliente == nit]
+    pagos_cliente = [pago for pago in pagos_acumulativos if pago.nit_cliente == nit]
+
+    # Iterar sobre las facturas del cliente
+    for factura in facturas_cliente:
+        # Buscar el pago correspondiente a esta factura
+        pago_correspondiente = next((pago for pago in pagos_cliente if pago.fecha >= factura.fecha), None)
+        if pago_correspondiente:
+            # Obtener detalles adicionales
+            cliente = next((c for c in clientes_acumulativos if c.nit == nit), None)
+            nombre_banco = next((b.nombre for b in bancos_acumulativos if b.codigo == pago_correspondiente.codigo_banco), None)
+            saldo = pago_correspondiente.valor - factura.valor
+            saldo_texto = f'{saldo} aún debe' if saldo < 0 else saldo
+            # Crear un diccionario con los detalles y agregarlo a los resultados
+            resultado = {
+                'nit_cliente': factura.nit_cliente,
+                'nombre_cliente': cliente.nombre if cliente else "",
+                'fecha_factura': factura.fecha,
+                'cantidad_factura': factura.valor,
+                'fecha_pago': pago_correspondiente.fecha,
+                'cantidad_pago': pago_correspondiente.valor,
+                'nombre_banco': nombre_banco,
+                'saldo': saldo_texto
+            }
+            resultados.append(resultado)
 
     # Ordenar los resultados por fecha de pago de forma descendente (de más reciente a más antigua)
     resultados = sorted(resultados, key=lambda x: x['fecha_pago'], reverse=True)

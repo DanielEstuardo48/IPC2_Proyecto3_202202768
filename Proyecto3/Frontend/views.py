@@ -14,6 +14,15 @@ def Cargar_F(request):
 def EstadoCuenta(request):
     return render (request, 'EstadoCuenta.html')
 
+def Estudiante(request):
+    return render (request,'Estudiante.html')
+
+def Documentacion(request):
+    return render (request,'Documentacion.html')
+
+def Ingresos(request):
+    return render (request,'Ingresos.html')
+
 
 def borrar_datos_backend(request):
     url = 'http://127.0.0.1:4000/borrardatos'
@@ -79,7 +88,6 @@ def mostrar_clientes(request):
         mensaje_error = 'Ocurrió un error al obtener los clientes: {}'.format(str(e))
         return render(request, 'EstadoCuenta.html', {'error': mensaje_error})
     
-
 def mostrar_cuenta(request):
     if request.method == 'POST':
         nit = request.POST.get('nit', '')
